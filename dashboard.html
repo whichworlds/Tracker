@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTC Options Dashboard</title>
+    <style>
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #151b3d;
+            --bg-card: #1a2035;
+            --text-primary: #e0e6ff;
+            --text-secondary: #8b93b8;
+            --accent-primary: #5b8def;
+            --accent-success: #26c281;
+            --accent-danger: #ef5b5b;
+            --accent-warning: #f39c12;
+            --border-color: #2a3150;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        #app {
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        header {
+            background: var(--bg-secondary);
+            padding: 1.5rem 2rem;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-warning);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.connected {
+            background: var(--accent-success);
+            animation: none;
+        }
+
+        .status-dot.error {
+            background: var(--accent-danger);
+            animation: pulse-error 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes pulse-error {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        main {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .card h2 {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-primary);
+        }
+
+        .position-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 968px) {
+            .position-inputs {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .position-group {
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .position-group h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .input-row {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1rem;
+        }
+
+        .input-row label {
+            margin-bottom: 0.4rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .input-row input {
+            padding: 0.7rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .input-row input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 6px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--accent-primary);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background: #4a7cd9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(91, 141, 239, 0.3);
+        }
+
+        .btn-danger {
+            background: var(--accent-danger);
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-danger:hover {
+            background: #d94545;
+        }
+
+        .btn-success {
+            background: var(--accent-success);
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-success:hover {
+            background: #20a86d;
+        }
+
+        .btn-debug {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            z-index: 100;
+        }
+
+        .btn-debug:hover {
+            background: var(--bg-secondary);
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 2rem;
+            font-style: italic;
+        }
+
+        .position-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .position-card.long {
+            border-left: 4px solid var(--accent-success);
+        }
+
+        .position-card.short {
+            border-left: 4px solid var(--accent-danger);
+        }
+
+        .position-card.spot {
+            border-left: 4px solid var(--accent-warning);
+        }
+
+        .position-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .position-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .position-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .position-badge.long {
+            background: rgba(38, 194, 129, 0.2);
+            color: var(--accent-success);
+        }
+
+        .position-badge.short {
+            background: rgba(239, 91, 91, 0.2);
+            color: var(--accent-danger);
+        }
+
+        .position-badge.spot {
+            background: rgba(243, 156, 18, 0.2);
+            color: var(--accent-warning);
+        }
+
+        .position-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .detail-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .greeks-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .greeks-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .pnl-display {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .pnl-display.positive {
+            border: 1px solid var(--accent-success);
+        }
+
+        .pnl-display.negative {
+            border: 1px solid var(--accent-danger);
+        }
+
+        .pnl-btc {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .pnl-display.positive .pnl-btc {
+            color: var(--accent-success);
+        }
+
+        .pnl-display.negative .pnl-btc {
+            color: var(--accent-danger);
+        }
+
+        .pnl-usd {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .position-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .rolling-inputs {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            display: none;
+        }
+
+        .rolling-inputs.active {
+            display: block;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .summary-item {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .summary-item.greeks {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 768px) {
+            .summary-item.greeks {
+                grid-column: span 1;
+            }
+        }
+
+        .summary-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .summary-value {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .btc-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .usd-value {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .summary-value.total .btc-value {
+            font-size: 1.8rem;
+            color: var(--accent-primary);
+        }
+
+        .debug-window {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-top: 2px solid var(--border-color);
+            max-height: 400px;
+            z-index: 1000;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .debug-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .debug-header h3 {
+            font-size: 1.1rem;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        .btn-close:hover {
+            background: var(--bg-secondary);
+        }
+
+        .debug-content {
+            padding: 1rem 1.5rem;
+            max-height: 320px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+
+        .debug-entry {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--border-color);
+        }
+
+        .debug-entry.success {
+            border-left-color: var(--accent-success);
+        }
+
+        .debug-entry.error {
+            border-left-color: var(--accent-danger);
+        }
+
+        .debug-entry.fallback {
+            border-left-color: var(--accent-warning);
+        }
+
+        .timestamp {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .source-badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            background: var(--bg-primary);
+            border-radius: 3px;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+
+        .source-badge.okx {
+            color: var(--accent-primary);
+        }
+
+        .source-badge.deribit {
+            color: var(--accent-warning);
+        }
+
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+
+        .alert.info {
+            background: rgba(91, 141, 239, 0.1);
+            border-left-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+
+        .alert.warning {
+            background: rgba(243, 156, 18, 0.1);
+            border-left-color: var(--accent-warning);
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>⚡ BTC Options Dashboard</h1>
+            <div class="connection-status" id="connectionStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">Connecting...</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="alert info">
+                <strong>📖 Standalone Version</strong> - This dashboard runs entirely in your browser. No installation required!
+                Just open this HTML file and start tracking your BTC options positions.
+            </div>
+
+            <!-- Position Entry Section -->
+            <section class="card">
+                <h2>📊 Position Entry</h2>
+
+                <div class="position-inputs">
+                    <!-- Long Position -->
+                    <div class="position-group">
+                        <h3>Long Position (LEAP or Spot)</h3>
+
+                        <div class="toggle-container">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="useSpotBTC">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <label for="useSpotBTC">Use Spot BTC (Δ = 1.0) instead of LEAP call</label>
+                        </div>
+
+                        <div id="longLeapInputs">
+                            <div class="input-row">
+                                <label>Contract (instId):</label>
+                                <input type="text" id="longInstId" placeholder="BTC-USD-270627-100000-C">
+                            </div>
+                            <div class="input-row">
+                                <label>Entry Price (BTC):</label>
+                                <input type="number" id="longEntryPrice" placeholder="0.05" step="0.0001">
+                            </div>
+                            <div class="input-row">
+                                <label>Amount:</label>
+                                <input type="number" id="longAmount" placeholder="10" step="0.1">
+                            </div>
+                            <div class="input-row">
+                                <label>Contract Size (BTC):</label>
+                                <input type="number" id="longContractSize" placeholder="0.01" step="0.0001">
+                            </div>
+                        </div>
+
+                        <div id="longSpotInputs" style="display: none;">
+                            <div class="input-row">
+                                <label>Spot Entry Price (BTC/USD):</label>
+                                <input type="number" id="spotEntryPrice" placeholder="95000" step="0.01">
+                            </div>
+                            <div class="input-row">
+                                <label>BTC Amount:</label>
+                                <input type="number" id="spotAmount" placeholder="1.0" step="0.001">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" id="addLongPosition">Add Long Position</button>
+                    </div>
+
+                    <!-- Short Position -->
+                    <div class="position-group">
+                        <h3>Short Position (Weekly Call)</h3>
+
+                        <div class="input-row">
+                            <label>Contract (instId):</label>
+                            <input type="text" id="shortInstId" placeholder="BTC-USD-251129-95000-C">
+                        </div>
+                        <div class="input-row">
+                            <label>Entry Price (BTC):</label>
+                            <input type="number" id="shortEntryPrice" placeholder="0.003" step="0.0001">
+                        </div>
+                        <div class="input-row">
+                            <label>Amount:</label>
+                            <input type="number" id="shortAmount" placeholder="10" step="0.1">
+                        </div>
+                        <div class="input-row">
+                            <label>Contract Size (BTC):</label>
+                            <input type="number" id="shortContractSize" placeholder="0.01" step="0.0001">
+                        </div>
+
+                        <button class="btn btn-primary" id="addShortPosition">Add Short Position</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Active Positions -->
+            <section class="card">
+                <h2>📈 Active Positions</h2>
+                <div id="activePositions">
+                    <p class="empty-state">No active positions. Add positions above to get started.</p>
+                </div>
+            </section>
+
+            <!-- Summary Panel -->
+            <section class="card">
+                <h2>💰 Summary</h2>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-label">Long PNL</div>
+                        <div class="summary-value" id="longPNL">
+                            <span class="btc-value">0.0000 BTC</span>
+                            <span class="usd-value">($0.00)</span>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Short PNL</div>
+                        <div class="summary-value" id="shortPNL">
+                            <span class="btc-value">0.0000 BTC</span>
+                            <span class="usd-value">($0.00)</span>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Total Live PNL</div>
+                        <div class="summary-value" id="totalLivePNL">
+                            <span class="btc-value">0.0000 BTC</span>
+                            <span class="usd-value">($0.00)</span>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Realized PNL</div>
+                        <div class="summary-value" id="realizedPNL">
+                            <span class="btc-value">0.0000 BTC</span>
+                            <span class="usd-value">($0.00)</span>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Total PNL</div>
+                        <div class="summary-value total" id="totalPNL">
+                            <span class="btc-value">0.0000 BTC</span>
+                            <span class="usd-value">($0.00)</span>
+                        </div>
+                    </div>
+                    <div class="summary-item greeks">
+                        <div class="summary-label">Combined Greeks (BTC Exposure)</div>
+                        <div class="greeks-grid" id="combinedGreeks">
+                            <div><strong>Δ:</strong> <span id="totalDelta">0.000</span></div>
+                            <div><strong>Γ:</strong> <span id="totalGamma">0.000</span></div>
+                            <div><strong>θ:</strong> <span id="totalTheta">0.000</span></div>
+                            <div><strong>ν:</strong> <span id="totalVega">0.000</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Debug Window -->
+        <button class="btn btn-debug" id="toggleDebug">Show Debug Window</button>
+        <div id="debugWindow" class="debug-window" style="display: none;">
+            <div class="debug-header">
+                <h3>🔍 Diagnostics Panel</h3>
+                <button class="btn-close" id="closeDebug">✕</button>
+            </div>
+            <div class="debug-content" id="debugContent">
+                <div class="debug-entry">
+                    <span class="timestamp">System initialized - Standalone version</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // DATA LAYER - API Integration with Fallback
+        // ============================================
+        class DataLayer {
+            constructor() {
+                this.debugCallbacks = [];
+                this.retryAttempts = 2;
+                this.retryDelay = 1000;
+                // Public CORS proxy for when direct access fails
+                this.corsProxy = 'https://corsproxy.io/?';
+            }
+
+            onDebug(callback) {
+                this.debugCallbacks.push(callback);
+            }
+
+            log(message, type = 'info', source = null) {
+                const entry = {
+                    timestamp: new Date().toISOString(),
+                    message,
+                    type,
+                    source
+                };
+                this.debugCallbacks.forEach(cb => cb(entry));
+            }
+
+            async fetchWithTimeout(url, timeout = 10000) {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+                try {
+                    const response = await fetch(url, {
+                        signal: controller.signal,
+                        mode: 'cors'
+                    });
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    return await response.json();
+                } catch (error) {
+                    clearTimeout(timeoutId);
+                    throw error;
+                }
+            }
+
+            async fetchWithProxy(url) {
+                // Try direct first, then with CORS proxy
+                try {
+                    return await this.fetchWithTimeout(url);
+                } catch (error) {
+                    this.log(`Direct access failed, trying CORS proxy...`, 'warning');
+                    const proxiedUrl = this.corsProxy + encodeURIComponent(url);
+                    return await this.fetchWithTimeout(proxiedUrl);
+                }
+            }
+
+            async fetchOKXMarkPrice(instId) {
+                const url = `https://www.okx.com/api/v5/public/mark-price?instType=OPTION&instId=${instId}`;
+                this.log(`Querying OKX mark price for ${instId}`, 'info', 'OKX');
+
+                try {
+                    const data = await this.fetchWithProxy(url);
+
+                    if (data.code !== '0') {
+                        throw new Error(`OKX API error: ${data.msg || 'Unknown error'}`);
+                    }
+
+                    if (!data.data || data.data.length === 0) {
+                        throw new Error('No data returned from OKX');
+                    }
+
+                    const result = parseFloat(data.data[0].markPx);
+                    this.log(`✓ OKX mark price: ${result} BTC`, 'success', 'OKX');
+                    return result;
+
+                } catch (error) {
+                    this.log(`✗ OKX mark price failed: ${error.message}`, 'error', 'OKX');
+                    throw error;
+                }
+            }
+
+            async fetchOKXGreeks(instId) {
+                const url = `https://www.okx.com/api/v5/public/option-summary?instId=${instId}`;
+                this.log(`Querying OKX Greeks for ${instId}`, 'info', 'OKX');
+
+                try {
+                    const data = await this.fetchWithProxy(url);
+
+                    if (data.code !== '0') {
+                        throw new Error(`OKX API error: ${data.msg || 'Unknown error'}`);
+                    }
+
+                    if (!data.data || data.data.length === 0) {
+                        throw new Error('No data returned from OKX');
+                    }
+
+                    const item = data.data[0];
+                    const greeks = {
+                        delta: parseFloat(item.delta) || 0,
+                        gamma: parseFloat(item.gamma) || 0,
+                        theta: parseFloat(item.theta) || 0,
+                        vega: parseFloat(item.vega) || 0
+                    };
+
+                    this.log(`✓ OKX Greeks received`, 'success', 'OKX');
+                    return greeks;
+
+                } catch (error) {
+                    this.log(`✗ OKX Greeks failed: ${error.message}`, 'error', 'OKX');
+                    throw error;
+                }
+            }
+
+            async fetchDeribitMarkPrice(instId) {
+                this.log(`Querying Deribit for BTC index price`, 'info', 'Deribit');
+
+                try {
+                    const url = 'https://www.deribit.com/api/v2/public/get_index_price?index_name=btc_usd';
+                    const data = await this.fetchWithProxy(url);
+
+                    if (!data.result) {
+                        throw new Error('Invalid response from Deribit');
+                    }
+
+                    const result = data.result.index_price;
+                    this.log(`✓ Deribit index price: $${result}`, 'success', 'Deribit');
+                    return result;
+
+                } catch (error) {
+                    this.log(`✗ Deribit failed: ${error.message}`, 'error', 'Deribit');
+                    throw error;
+                }
+            }
+
+            async fetchBTCSpotPrice() {
+                this.log('Querying BTC spot price', 'info', 'OKX');
+
+                try {
+                    const url = 'https://www.okx.com/api/v5/public/mark-price?instType=SPOT&instId=BTC-USDT';
+                    const data = await this.fetchWithProxy(url);
+
+                    if (data.code !== '0' || !data.data || data.data.length === 0) {
+                        throw new Error('Failed to get BTC spot price from OKX');
+                    }
+
+                    const price = parseFloat(data.data[0].markPx);
+                    this.log(`✓ BTC spot price: $${price.toFixed(2)}`, 'success', 'OKX');
+                    return price;
+
+                } catch (error) {
+                    this.log(`✗ BTC spot price failed from OKX: ${error.message}`, 'error', 'OKX');
+
+                    try {
+                        this.log('Falling back to Deribit for BTC spot price', 'fallback', 'Deribit');
+                        const price = await this.fetchDeribitMarkPrice('BTC-USD');
+                        return price;
+
+                    } catch (fallbackError) {
+                        this.log(`✗ Deribit fallback also failed: ${fallbackError.message}`, 'error', 'Deribit');
+                        throw new Error('All sources failed for BTC spot price');
+                    }
+                }
+            }
+
+            async fetchMarkPriceWithFallback(instId) {
+                try {
+                    return {
+                        price: await this.fetchOKXMarkPrice(instId),
+                        source: 'OKX'
+                    };
+                } catch (error) {
+                    this.log('⚠ Falling back to Deribit for mark price', 'fallback', 'Deribit');
+                    try {
+                        return {
+                            price: await this.fetchDeribitMarkPrice(instId),
+                            source: 'Deribit'
+                        };
+                    } catch (fallbackError) {
+                        this.log('Both OKX and Deribit failed for mark price', 'error');
+                        throw new Error('All sources failed');
+                    }
+                }
+            }
+
+            async fetchGreeksWithFallback(instId) {
+                try {
+                    return {
+                        greeks: await this.fetchOKXGreeks(instId),
+                        source: 'OKX'
+                    };
+                } catch (error) {
+                    this.log('⚠ Greeks fallback not available, using zeros', 'fallback');
+                    return {
+                        greeks: { delta: 0, gamma: 0, theta: 0, vega: 0 },
+                        source: 'Fallback'
+                    };
+                }
+            }
+        }
+
+        // ============================================
+        // MAIN APPLICATION
+        // ============================================
+        class BTCOptionsDashboard {
+            constructor() {
+                this.dataLayer = new DataLayer();
+                this.positions = {
+                    long: null,
+                    short: null,
+                    spot: null
+                };
+                this.realizedPNL = 0;
+                this.btcPrice = 0;
+                this.updateInterval = null;
+
+                this.init();
+            }
+
+            async init() {
+                this.setupDebugger();
+                this.setupEventListeners();
+                this.loadFromLocalStorage();
+                await this.startPriceUpdates();
+                this.render();
+            }
+
+            setupDebugger() {
+                this.dataLayer.onDebug((entry) => {
+                    this.addDebugEntry(entry);
+                    this.updateConnectionStatus(entry);
+                });
+            }
+
+            setupEventListeners() {
+                const useSpotToggle = document.getElementById('useSpotBTC');
+                useSpotToggle.addEventListener('change', (e) => {
+                    const longLeapInputs = document.getElementById('longLeapInputs');
+                    const longSpotInputs = document.getElementById('longSpotInputs');
+
+                    if (e.target.checked) {
+                        longLeapInputs.style.display = 'none';
+                        longSpotInputs.style.display = 'block';
+                    } else {
+                        longLeapInputs.style.display = 'block';
+                        longSpotInputs.style.display = 'none';
+                    }
+                });
+
+                document.getElementById('addLongPosition').addEventListener('click', () => {
+                    this.addLongPosition();
+                });
+
+                document.getElementById('addShortPosition').addEventListener('click', () => {
+                    this.addShortPosition();
+                });
+
+                document.getElementById('toggleDebug').addEventListener('click', () => {
+                    const debugWindow = document.getElementById('debugWindow');
+                    const btn = document.getElementById('toggleDebug');
+                    if (debugWindow.style.display === 'none') {
+                        debugWindow.style.display = 'block';
+                        btn.textContent = 'Hide Debug Window';
+                    } else {
+                        debugWindow.style.display = 'none';
+                        btn.textContent = 'Show Debug Window';
+                    }
+                });
+
+                document.getElementById('closeDebug').addEventListener('click', () => {
+                    document.getElementById('debugWindow').style.display = 'none';
+                    document.getElementById('toggleDebug').textContent = 'Show Debug Window';
+                });
+            }
+
+            addLongPosition() {
+                const useSpot = document.getElementById('useSpotBTC').checked;
+
+                if (useSpot) {
+                    const entryPrice = parseFloat(document.getElementById('spotEntryPrice').value);
+                    const amount = parseFloat(document.getElementById('spotAmount').value);
+
+                    if (!entryPrice || !amount) {
+                        alert('Please fill in all spot BTC fields');
+                        return;
+                    }
+
+                    this.positions.spot = {
+                        type: 'spot',
+                        entryPrice,
+                        amount
+                    };
+
+                    this.positions.long = null;
+
+                } else {
+                    const instId = document.getElementById('longInstId').value.trim();
+                    const entryPrice = parseFloat(document.getElementById('longEntryPrice').value);
+                    const amount = parseFloat(document.getElementById('longAmount').value);
+                    const contractSize = parseFloat(document.getElementById('longContractSize').value);
+
+                    if (!instId || !entryPrice || !amount || !contractSize) {
+                        alert('Please fill in all long position fields');
+                        return;
+                    }
+
+                    this.positions.long = {
+                        type: 'long',
+                        instId,
+                        entryPrice,
+                        amount,
+                        contractSize,
+                        markPrice: 0,
+                        greeks: { delta: 0, gamma: 0, theta: 0, vega: 0 },
+                        source: null,
+                        lastUpdate: null
+                    };
+
+                    this.positions.spot = null;
+                }
+
+                this.saveToLocalStorage();
+                this.render();
+                this.updateAllPrices();
+            }
+
+            addShortPosition() {
+                const instId = document.getElementById('shortInstId').value.trim();
+                const entryPrice = parseFloat(document.getElementById('shortEntryPrice').value);
+                const amount = parseFloat(document.getElementById('shortAmount').value);
+                const contractSize = parseFloat(document.getElementById('shortContractSize').value);
+
+                if (!instId || !entryPrice || !amount || !contractSize) {
+                    alert('Please fill in all short position fields');
+                    return;
+                }
+
+                this.positions.short = {
+                    type: 'short',
+                    instId,
+                    entryPrice,
+                    amount,
+                    contractSize,
+                    markPrice: 0,
+                    greeks: { delta: 0, gamma: 0, theta: 0, vega: 0 },
+                    source: null,
+                    lastUpdate: null
+                };
+
+                this.saveToLocalStorage();
+                this.render();
+                this.updateAllPrices();
+            }
+
+            async startPriceUpdates() {
+                await this.updateAllPrices();
+
+                if (this.updateInterval) {
+                    clearInterval(this.updateInterval);
+                }
+
+                // Update every 10 seconds
+                this.updateInterval = setInterval(() => {
+                    this.updateAllPrices();
+                }, 10000);
+            }
+
+            async updateAllPrices() {
+                try {
+                    this.btcPrice = await this.dataLayer.fetchBTCSpotPrice();
+
+                    const promises = [];
+
+                    if (this.positions.long) {
+                        promises.push(this.updatePosition(this.positions.long));
+                    }
+
+                    if (this.positions.short) {
+                        promises.push(this.updatePosition(this.positions.short));
+                    }
+
+                    await Promise.all(promises);
+
+                    this.render();
+
+                } catch (error) {
+                    console.error('Error updating prices:', error);
+                }
+            }
+
+            async updatePosition(position) {
+                try {
+                    const [markData, greeksData] = await Promise.all([
+                        this.dataLayer.fetchMarkPriceWithFallback(position.instId),
+                        this.dataLayer.fetchGreeksWithFallback(position.instId)
+                    ]);
+
+                    position.markPrice = markData.price;
+                    position.greeks = greeksData.greeks;
+                    position.source = markData.source;
+                    position.lastUpdate = new Date();
+
+                } catch (error) {
+                    console.error(`Error updating position ${position.instId}:`, error);
+                }
+            }
+
+            calculatePNL() {
+                let longPNL = 0;
+                let shortPNL = 0;
+
+                if (this.positions.spot) {
+                    const spot = this.positions.spot;
+                    const btcPNL = ((this.btcPrice - spot.entryPrice) / this.btcPrice) * spot.amount;
+                    longPNL = btcPNL;
+                } else if (this.positions.long) {
+                    const long = this.positions.long;
+                    longPNL = (long.markPrice - long.entryPrice) * long.amount * long.contractSize;
+                }
+
+                if (this.positions.short) {
+                    const short = this.positions.short;
+                    shortPNL = (short.entryPrice - short.markPrice) * short.amount * short.contractSize;
+                }
+
+                const totalLive = longPNL + shortPNL;
+                const totalPNL = totalLive + this.realizedPNL;
+
+                return { longPNL, shortPNL, totalLive, totalPNL };
+            }
+
+            calculateGreeks() {
+                let totalDelta = 0;
+                let totalGamma = 0;
+                let totalTheta = 0;
+                let totalVega = 0;
+
+                if (this.positions.spot) {
+                    totalDelta = this.positions.spot.amount;
+                } else if (this.positions.long) {
+                    const long = this.positions.long;
+                    totalDelta += long.greeks.delta * long.amount * long.contractSize;
+                    totalGamma += long.greeks.gamma * long.amount * long.contractSize;
+                    totalTheta += long.greeks.theta * long.amount * long.contractSize;
+                    totalVega += long.greeks.vega * long.amount * long.contractSize;
+                }
+
+                if (this.positions.short) {
+                    const short = this.positions.short;
+                    totalDelta -= short.greeks.delta * short.amount * short.contractSize;
+                    totalGamma -= short.greeks.gamma * short.amount * short.contractSize;
+                    totalTheta -= short.greeks.theta * short.amount * short.contractSize;
+                    totalVega -= short.greeks.vega * short.amount * short.contractSize;
+                }
+
+                return { totalDelta, totalGamma, totalTheta, totalVega };
+            }
+
+            closePosition(positionType) {
+                if (!confirm(`Are you sure you want to close the ${positionType} position?`)) {
+                    return;
+                }
+
+                const closingPrice = prompt(`Enter closing price in BTC:`);
+                if (!closingPrice) return;
+
+                const price = parseFloat(closingPrice);
+                if (isNaN(price)) {
+                    alert('Invalid price');
+                    return;
+                }
+
+                const position = this.positions[positionType];
+                let pnl = 0;
+
+                if (positionType === 'spot') {
+                    const btcPNL = ((this.btcPrice - position.entryPrice) / this.btcPrice) * position.amount;
+                    pnl = btcPNL;
+                } else if (positionType === 'long') {
+                    pnl = (price - position.entryPrice) * position.amount * position.contractSize;
+                } else if (positionType === 'short') {
+                    pnl = (position.entryPrice - price) * position.amount * position.contractSize;
+                }
+
+                this.realizedPNL += pnl;
+                this.positions[positionType] = null;
+
+                this.saveToLocalStorage();
+                this.render();
+
+                alert(`Position closed. PNL: ${pnl.toFixed(4)} BTC ($${(pnl * this.btcPrice).toFixed(2)})`);
+            }
+
+            rollPosition(positionType) {
+                const rollDiv = document.getElementById(`roll-${positionType}`);
+                rollDiv.classList.toggle('active');
+            }
+
+            executeRoll(positionType) {
+                const newInstId = document.getElementById(`roll-${positionType}-instId`).value.trim();
+                const newEntryPrice = parseFloat(document.getElementById(`roll-${positionType}-price`).value);
+                const closingPrice = parseFloat(document.getElementById(`roll-${positionType}-closing`).value);
+
+                if (!newInstId || !newEntryPrice || !closingPrice) {
+                    alert('Please fill in all rolling fields');
+                    return;
+                }
+
+                const position = this.positions[positionType];
+                let pnl = 0;
+
+                if (positionType === 'long') {
+                    pnl = (closingPrice - position.entryPrice) * position.amount * position.contractSize;
+                } else if (positionType === 'short') {
+                    pnl = (position.entryPrice - closingPrice) * position.amount * position.contractSize;
+                }
+
+                this.realizedPNL += pnl;
+
+                position.instId = newInstId;
+                position.entryPrice = newEntryPrice;
+                position.markPrice = 0;
+                position.greeks = { delta: 0, gamma: 0, theta: 0, vega: 0 };
+
+                this.saveToLocalStorage();
+                this.updateAllPrices();
+
+                document.getElementById(`roll-${positionType}`).classList.remove('active');
+                this.render();
+
+                alert(`Position rolled. Realized PNL: ${pnl.toFixed(4)} BTC ($${(pnl * this.btcPrice).toFixed(2)})`);
+            }
+
+            render() {
+                this.renderActivePositions();
+                this.renderSummary();
+            }
+
+            renderActivePositions() {
+                const container = document.getElementById('activePositions');
+                const hasPositions = this.positions.long || this.positions.short || this.positions.spot;
+
+                if (!hasPositions) {
+                    container.innerHTML = '<p class="empty-state">No active positions. Add positions above to get started.</p>';
+                    return;
+                }
+
+                let html = '';
+
+                if (this.positions.spot) {
+                    html += this.renderSpotPosition(this.positions.spot);
+                } else if (this.positions.long) {
+                    html += this.renderOptionPosition(this.positions.long, 'long');
+                }
+
+                if (this.positions.short) {
+                    html += this.renderOptionPosition(this.positions.short, 'short');
+                }
+
+                container.innerHTML = html;
+
+                if (this.positions.long) {
+                    this.attachPositionEventListeners('long');
+                }
+                if (this.positions.short) {
+                    this.attachPositionEventListeners('short');
+                }
+                if (this.positions.spot) {
+                    document.getElementById('close-spot').addEventListener('click', () => this.closePosition('spot'));
+                }
+            }
+
+            renderSpotPosition(position) {
+                const btcPNL = ((this.btcPrice - position.entryPrice) / this.btcPrice) * position.amount;
+                const usdPNL = btcPNL * this.btcPrice;
+                const pnlClass = btcPNL >= 0 ? 'positive' : 'negative';
+
+                return `
+                    <div class="position-card spot">
+                        <div class="position-header">
+                            <div class="position-title">Spot BTC</div>
+                            <span class="position-badge spot">SPOT</span>
+                        </div>
+
+                        <div class="position-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Entry Price:</span>
+                                <span class="detail-value">$${position.entryPrice.toFixed(2)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Current Price:</span>
+                                <span class="detail-value">$${this.btcPrice.toFixed(2)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Amount:</span>
+                                <span class="detail-value">${position.amount.toFixed(4)} BTC</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Delta:</span>
+                                <span class="detail-value">${position.amount.toFixed(4)} (1.0 × amount)</span>
+                            </div>
+                        </div>
+
+                        <div class="pnl-display ${pnlClass}">
+                            <div class="pnl-btc">${btcPNL >= 0 ? '+' : ''}${btcPNL.toFixed(4)} BTC</div>
+                            <div class="pnl-usd">($${usdPNL >= 0 ? '+' : ''}${usdPNL.toFixed(2)})</div>
+                        </div>
+
+                        <div class="position-actions">
+                            <button class="btn btn-danger" id="close-spot">Close Position</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderOptionPosition(position, type) {
+                const pnl = type === 'long'
+                    ? (position.markPrice - position.entryPrice) * position.amount * position.contractSize
+                    : (position.entryPrice - position.markPrice) * position.amount * position.contractSize;
+
+                const usdPNL = pnl * this.btcPrice;
+                const pnlClass = pnl >= 0 ? 'positive' : 'negative';
+
+                return `
+                    <div class="position-card ${type}">
+                        <div class="position-header">
+                            <div class="position-title">${position.instId}</div>
+                            <span class="position-badge ${type}">${type.toUpperCase()}</span>
+                        </div>
+
+                        <div class="position-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Entry Price:</span>
+                                <span class="detail-value">${position.entryPrice.toFixed(4)} BTC</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Mark Price:</span>
+                                <span class="detail-value">${position.markPrice.toFixed(4)} BTC</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Amount:</span>
+                                <span class="detail-value">${position.amount}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Contract Size:</span>
+                                <span class="detail-value">${position.contractSize} BTC</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Source:</span>
+                                <span class="detail-value">
+                                    <span class="source-badge ${position.source?.toLowerCase()}">${position.source || 'N/A'}</span>
+                                </span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Last Update:</span>
+                                <span class="detail-value">${position.lastUpdate ? new Date(position.lastUpdate).toLocaleTimeString() : 'N/A'}</span>
+                            </div>
+                        </div>
+
+                        <div class="greeks-section">
+                            <div class="greeks-grid">
+                                <div><strong>Δ:</strong> ${position.greeks.delta.toFixed(4)}</div>
+                                <div><strong>Γ:</strong> ${position.greeks.gamma.toFixed(4)}</div>
+                                <div><strong>θ:</strong> ${position.greeks.theta.toFixed(4)}</div>
+                                <div><strong>ν:</strong> ${position.greeks.vega.toFixed(4)}</div>
+                            </div>
+                        </div>
+
+                        <div class="pnl-display ${pnlClass}">
+                            <div class="pnl-btc">${pnl >= 0 ? '+' : ''}${pnl.toFixed(4)} BTC</div>
+                            <div class="pnl-usd">($${usdPNL >= 0 ? '+' : ''}${usdPNL.toFixed(2)})</div>
+                        </div>
+
+                        <div class="position-actions">
+                            <button class="btn btn-danger" id="close-${type}">Close Position</button>
+                            <button class="btn btn-success" id="roll-${type}-btn">Roll Position</button>
+                        </div>
+
+                        <div class="rolling-inputs" id="roll-${type}">
+                            <h4>Roll to New Position</h4>
+                            <div class="input-row">
+                                <label>Closing Price (BTC):</label>
+                                <input type="number" id="roll-${type}-closing" placeholder="0.003" step="0.0001">
+                            </div>
+                            <div class="input-row">
+                                <label>New Contract (instId):</label>
+                                <input type="text" id="roll-${type}-instId" placeholder="BTC-USD-251128-95000-C">
+                            </div>
+                            <div class="input-row">
+                                <label>New Entry Price (BTC):</label>
+                                <input type="number" id="roll-${type}-price" placeholder="0.003" step="0.0001">
+                            </div>
+                            <button class="btn btn-primary" id="execute-roll-${type}">Execute Roll</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            attachPositionEventListeners(type) {
+                document.getElementById(`close-${type}`).addEventListener('click', () => this.closePosition(type));
+                document.getElementById(`roll-${type}-btn`).addEventListener('click', () => this.rollPosition(type));
+                document.getElementById(`execute-roll-${type}`).addEventListener('click', () => this.executeRoll(type));
+            }
+
+            renderSummary() {
+                const pnl = this.calculatePNL();
+                const greeks = this.calculateGreeks();
+
+                this.updateSummaryValue('longPNL', pnl.longPNL);
+                this.updateSummaryValue('shortPNL', pnl.shortPNL);
+                this.updateSummaryValue('totalLivePNL', pnl.totalLive);
+                this.updateSummaryValue('realizedPNL', this.realizedPNL);
+                this.updateSummaryValue('totalPNL', pnl.totalPNL);
+
+                document.getElementById('totalDelta').textContent = greeks.totalDelta.toFixed(4);
+                document.getElementById('totalGamma').textContent = greeks.totalGamma.toFixed(4);
+                document.getElementById('totalTheta').textContent = greeks.totalTheta.toFixed(4);
+                document.getElementById('totalVega').textContent = greeks.totalVega.toFixed(4);
+            }
+
+            updateSummaryValue(elementId, btcValue) {
+                const element = document.getElementById(elementId);
+                const usdValue = btcValue * this.btcPrice;
+
+                const btcSpan = element.querySelector('.btc-value');
+                const usdSpan = element.querySelector('.usd-value');
+
+                btcSpan.textContent = `${btcValue >= 0 ? '+' : ''}${btcValue.toFixed(4)} BTC`;
+                usdSpan.textContent = `($${usdValue >= 0 ? '+' : ''}${usdValue.toFixed(2)})`;
+
+                btcSpan.style.color = btcValue >= 0 ? 'var(--accent-success)' : 'var(--accent-danger)';
+            }
+
+            addDebugEntry(entry) {
+                const debugContent = document.getElementById('debugContent');
+                const entryDiv = document.createElement('div');
+                entryDiv.className = `debug-entry ${entry.type}`;
+
+                const timestamp = new Date(entry.timestamp).toLocaleTimeString();
+                const sourceBadge = entry.source ? `<span class="source-badge ${entry.source.toLowerCase()}">${entry.source}</span>` : '';
+
+                entryDiv.innerHTML = `
+                    <span class="timestamp">[${timestamp}]</span> ${entry.message} ${sourceBadge}
+                `;
+
+                debugContent.appendChild(entryDiv);
+                debugContent.scrollTop = debugContent.scrollHeight;
+
+                // Keep only last 100 entries
+                while (debugContent.children.length > 100) {
+                    debugContent.removeChild(debugContent.firstChild);
+                }
+            }
+
+            updateConnectionStatus(entry) {
+                const statusElement = document.getElementById('connectionStatus');
+                const dot = statusElement.querySelector('.status-dot');
+                const text = statusElement.querySelector('.status-text');
+
+                if (entry.type === 'success' && entry.source) {
+                    dot.className = 'status-dot connected';
+                    text.textContent = `Connected to ${entry.source}`;
+                } else if (entry.type === 'error') {
+                    dot.className = 'status-dot error';
+                    text.textContent = 'Connection Error';
+                } else if (entry.type === 'fallback') {
+                    dot.className = 'status-dot connected';
+                    text.textContent = `Fallback active: using ${entry.source}`;
+                }
+            }
+
+            saveToLocalStorage() {
+                const data = {
+                    positions: this.positions,
+                    realizedPNL: this.realizedPNL
+                };
+                localStorage.setItem('btc-options-dashboard', JSON.stringify(data));
+            }
+
+            loadFromLocalStorage() {
+                const stored = localStorage.getItem('btc-options-dashboard');
+                if (stored) {
+                    try {
+                        const data = JSON.parse(stored);
+                        this.positions = data.positions || { long: null, short: null, spot: null };
+                        this.realizedPNL = data.realizedPNL || 0;
+                    } catch (error) {
+                        console.error('Error loading from localStorage:', error);
+                    }
+                }
+            }
+        }
+
+        // Initialize the dashboard when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new BTCOptionsDashboard();
+        });
+    </script>
+</body>
+</html>
