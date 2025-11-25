@@ -297,6 +297,18 @@
             background: #20a86d;
         }
 
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
         .btn-debug {
             position: fixed;
             bottom: 2rem;
@@ -310,126 +322,6 @@
         .btn-debug:hover {
             background: var(--bg-secondary);
             transform: translateY(-2px);
-        }
-
-        /* CUSTOM MODAL STYLES */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.2s ease-out;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(-30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-content {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            animation: slideIn 0.3s ease-out;
-        }
-
-        .modal-header {
-            font-size: 1.4rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--accent-primary);
-        }
-
-        .modal-body {
-            margin-bottom: 1.5rem;
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-
-        .modal-input {
-            width: 100%;
-            padding: 0.8rem;
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: var(--text-primary);
-            font-size: 1rem;
-            margin-top: 0.5rem;
-        }
-
-        .modal-input:focus {
-            outline: none;
-            border-color: var(--accent-primary);
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 0.8rem;
-            justify-content: flex-end;
-        }
-
-        .modal-btn {
-            padding: 0.7rem 1.5rem;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .modal-btn-primary {
-            background: var(--accent-primary);
-            color: white;
-        }
-
-        .modal-btn-primary:hover {
-            background: #4a7cd9;
-        }
-
-        .modal-btn-danger {
-            background: var(--accent-danger);
-            color: white;
-        }
-
-        .modal-btn-danger:hover {
-            background: #d94545;
-        }
-
-        .modal-btn-secondary {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        .modal-btn-secondary:hover {
-            background: var(--border-color);
         }
 
         .empty-state {
@@ -523,11 +415,37 @@
             border-top: 1px solid var(--border-color);
         }
 
+        .greeks-section h4 {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .greeks-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 1rem;
             font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .greek-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .greek-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .greek-value {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
         }
 
         .pnl-display {
@@ -572,16 +490,106 @@
             flex-wrap: wrap;
         }
 
-        .rolling-inputs {
+        /* CLOSE/ROLL PANEL */
+        .action-panel {
             margin-top: 1rem;
-            padding: 1rem;
+            padding: 1.5rem;
             background: var(--bg-primary);
-            border-radius: 6px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
             display: none;
+            animation: slideDown 0.3s ease-out;
         }
 
-        .rolling-inputs.active {
+        .action-panel.active {
             display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+                padding: 0 1.5rem;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+                padding: 1.5rem;
+            }
+        }
+
+        .action-panel h4 {
+            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+            color: var(--accent-primary);
+        }
+
+        .panel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .panel-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin: 1rem 0;
+            padding: 0.8rem;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+        }
+
+        .checkbox-row input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-row label {
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .pnl-preview {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .pnl-preview-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pnl-preview-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+
+        .pnl-preview-value.positive {
+            color: var(--accent-success);
+        }
+
+        .pnl-preview-value.negative {
+            color: var(--accent-danger);
+        }
+
+        .panel-buttons {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
         }
 
         .summary-grid {
@@ -888,24 +896,27 @@
                     <div class="summary-item greeks">
                         <div class="summary-label">Combined Greeks (BTC Exposure)</div>
                         <div class="greeks-grid" id="combinedGreeks">
-                            <div><strong>Δ:</strong> <span id="totalDelta">0.000</span></div>
-                            <div><strong>Γ:</strong> <span id="totalGamma">0.000</span></div>
-                            <div><strong>θ:</strong> <span id="totalTheta">0.000</span></div>
-                            <div><strong>ν:</strong> <span id="totalVega">0.000</span></div>
+                            <div class="greek-item">
+                                <div class="greek-label">Delta</div>
+                                <div class="greek-value" id="totalDelta">0.000</div>
+                            </div>
+                            <div class="greek-item">
+                                <div class="greek-label">Gamma</div>
+                                <div class="greek-value" id="totalGamma">0.000</div>
+                            </div>
+                            <div class="greek-item">
+                                <div class="greek-label">Theta</div>
+                                <div class="greek-value" id="totalTheta">0.000</div>
+                            </div>
+                            <div class="greek-item">
+                                <div class="greek-label">Vega</div>
+                                <div class="greek-value" id="totalVega">0.000</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
         </main>
-
-        <!-- Custom Modal -->
-        <div class="modal-overlay" id="customModal">
-            <div class="modal-content">
-                <div class="modal-header" id="modalTitle">Confirm</div>
-                <div class="modal-body" id="modalBody">Are you sure?</div>
-                <div class="modal-buttons" id="modalButtons"></div>
-            </div>
-        </div>
 
         <!-- Debug Window -->
         <button class="btn btn-debug" id="toggleDebug">Show Debug Window</button>
@@ -923,98 +934,6 @@
     </div>
 
     <script>
-        // ============================================
-        // CUSTOM MODAL SYSTEM
-        // ============================================
-        class Modal {
-            constructor() {
-                this.overlay = document.getElementById('customModal');
-                this.title = document.getElementById('modalTitle');
-                this.body = document.getElementById('modalBody');
-                this.buttons = document.getElementById('modalButtons');
-            }
-
-            show(title, body, buttonsConfig) {
-                this.title.textContent = title;
-
-                if (typeof body === 'string') {
-                    this.body.textContent = body;
-                } else {
-                    this.body.innerHTML = '';
-                    this.body.appendChild(body);
-                }
-
-                this.buttons.innerHTML = '';
-                buttonsConfig.forEach(btn => {
-                    const button = document.createElement('button');
-                    button.className = `modal-btn modal-btn-${btn.type || 'secondary'}`;
-                    button.textContent = btn.text;
-                    button.onclick = () => {
-                        if (btn.onClick) btn.onClick();
-                        this.hide();
-                    };
-                    this.buttons.appendChild(button);
-                });
-
-                this.overlay.classList.add('active');
-            }
-
-            hide() {
-                this.overlay.classList.remove('active');
-            }
-
-            alert(title, message) {
-                return new Promise(resolve => {
-                    this.show(title, message, [
-                        { text: 'OK', type: 'primary', onClick: () => resolve(true) }
-                    ]);
-                });
-            }
-
-            confirm(title, message) {
-                return new Promise(resolve => {
-                    this.show(title, message, [
-                        { text: 'Cancel', type: 'secondary', onClick: () => resolve(false) },
-                        { text: 'Confirm', type: 'primary', onClick: () => resolve(true) }
-                    ]);
-                });
-            }
-
-            confirmDanger(title, message) {
-                return new Promise(resolve => {
-                    this.show(title, message, [
-                        { text: 'Cancel', type: 'secondary', onClick: () => resolve(false) },
-                        { text: 'Confirm', type: 'danger', onClick: () => resolve(true) }
-                    ]);
-                });
-            }
-
-            prompt(title, message, defaultValue = '', placeholder = '') {
-                return new Promise(resolve => {
-                    const input = document.createElement('input');
-                    input.className = 'modal-input';
-                    input.type = 'number';
-                    input.step = '0.0001';
-                    input.placeholder = placeholder;
-                    input.value = defaultValue;
-
-                    const container = document.createElement('div');
-                    const label = document.createElement('div');
-                    label.textContent = message;
-                    label.style.marginBottom = '0.8rem';
-                    container.appendChild(label);
-                    container.appendChild(input);
-
-                    this.show(title, container, [
-                        { text: 'Cancel', type: 'secondary', onClick: () => resolve(null) },
-                        { text: 'OK', type: 'primary', onClick: () => resolve(input.value) }
-                    ]);
-
-                    setTimeout(() => input.focus(), 100);
-                });
-            }
-        }
-
         // ============================================
         // DATA LAYER - API Integration with Fallback
         // ============================================
@@ -1221,7 +1140,6 @@
         // ============================================
         class BTCOptionsDashboard {
             constructor() {
-                this.modal = new Modal();
                 this.dataLayer = new DataLayer();
                 this.positions = {
                     long: null,
@@ -1291,7 +1209,7 @@
                 });
             }
 
-            async addLongPosition() {
+            addLongPosition() {
                 const useSpot = document.getElementById('useSpotBTC').checked;
 
                 if (useSpot) {
@@ -1299,7 +1217,7 @@
                     const amount = parseFloat(document.getElementById('spotAmount').value);
 
                     if (!entryPrice || !amount) {
-                        await this.modal.alert('Invalid Input', 'Please fill in all spot BTC fields');
+                        alert('Please fill in all spot BTC fields');
                         return;
                     }
 
@@ -1317,7 +1235,7 @@
                     const btcAmount = parseFloat(document.getElementById('longBTCAmount').value);
 
                     if (!instId || !entryPrice || !btcAmount) {
-                        await this.modal.alert('Invalid Input', 'Please fill in all long position fields');
+                        alert('Please fill in all long position fields');
                         return;
                     }
 
@@ -1340,13 +1258,13 @@
                 this.updateAllPrices();
             }
 
-            async addShortPosition() {
+            addShortPosition() {
                 const instId = document.getElementById('shortInstId').value.trim();
                 const entryPrice = parseFloat(document.getElementById('shortEntryPrice').value);
                 const btcAmount = parseFloat(document.getElementById('shortBTCAmount').value);
 
                 if (!instId || !entryPrice || !btcAmount) {
-                    await this.modal.alert('Invalid Input', 'Please fill in all short position fields');
+                    alert('Please fill in all short position fields');
                     return;
                 }
 
@@ -1439,13 +1357,11 @@
                     longPNL = btcPNL;
                 } else if (this.positions.long) {
                     const long = this.positions.long;
-                    // PNL = (mark - entry) * btcAmount / entry
                     longPNL = ((long.markPrice - long.entryPrice) / long.entryPrice) * long.btcAmount;
                 }
 
                 if (this.positions.short) {
                     const short = this.positions.short;
-                    // PNL = (entry - mark) * btcAmount / entry
                     shortPNL = ((short.entryPrice - short.markPrice) / short.entryPrice) * short.btcAmount;
                 }
 
@@ -1465,7 +1381,6 @@
                     totalDelta = this.positions.spot.amount;
                 } else if (this.positions.long) {
                     const long = this.positions.long;
-                    // Greeks scaled by BTC amount
                     totalDelta += long.greeks.delta * long.btcAmount;
                     totalGamma += long.greeks.gamma * long.btcAmount;
                     totalTheta += long.greeks.theta * long.btcAmount;
@@ -1483,39 +1398,86 @@
                 return { totalDelta, totalGamma, totalTheta, totalVega };
             }
 
-            async closePosition(positionType) {
-                const confirmed = await this.modal.confirmDanger(
-                    'Close Position',
-                    `Are you sure you want to close the ${positionType} position?`
-                );
+            toggleClosePanel(positionType) {
+                const panel = document.getElementById(`close-panel-${positionType}`);
+                const rollPanel = document.getElementById(`roll-panel-${positionType}`);
 
-                if (!confirmed) return;
+                if (rollPanel) rollPanel.classList.remove('active');
+                panel.classList.toggle('active');
 
-                const closingPrice = await this.modal.prompt(
-                    'Close Position',
-                    'Enter closing price (BTC):',
-                    '',
-                    '0.003'
-                );
+                if (panel.classList.contains('active')) {
+                    this.updateClosePNLPreview(positionType);
+                }
+            }
 
-                if (!closingPrice) return;
+            toggleRollPanel(positionType) {
+                const panel = document.getElementById(`roll-panel-${positionType}`);
+                const closePanel = document.getElementById(`close-panel-${positionType}`);
 
-                const price = parseFloat(closingPrice);
-                if (isNaN(price)) {
-                    await this.modal.alert('Invalid Price', 'Please enter a valid number');
+                if (closePanel) closePanel.classList.remove('active');
+                panel.classList.toggle('active');
+
+                if (panel.classList.contains('active')) {
+                    this.updateRollPNLPreview(positionType);
+                }
+            }
+
+            updateClosePNLPreview(positionType) {
+                const position = this.positions[positionType];
+                let exitPrice, pnl = 0;
+
+                if (positionType === 'spot') {
+                    exitPrice = parseFloat(document.getElementById(`close-exit-${positionType}`).value) || this.btcPrice;
+                    pnl = ((exitPrice - position.entryPrice) / exitPrice) * position.amount;
+                } else {
+                    exitPrice = parseFloat(document.getElementById(`close-exit-${positionType}`).value) || position.markPrice;
+                    if (positionType === 'long') {
+                        pnl = ((exitPrice - position.entryPrice) / position.entryPrice) * position.btcAmount;
+                    } else if (positionType === 'short') {
+                        pnl = ((position.entryPrice - exitPrice) / position.entryPrice) * position.btcAmount;
+                    }
+                }
+
+                const previewEl = document.getElementById(`close-pnl-preview-${positionType}`);
+                const valueEl = previewEl.querySelector('.pnl-preview-value');
+                valueEl.textContent = `${pnl >= 0 ? '+' : ''}${pnl.toFixed(4)} β`;
+                valueEl.className = `pnl-preview-value ${pnl >= 0 ? 'positive' : 'negative'}`;
+            }
+
+            updateRollPNLPreview(positionType) {
+                const position = this.positions[positionType];
+                const exitPrice = parseFloat(document.getElementById(`roll-exit-${positionType}`).value) || position.markPrice;
+
+                let pnl = 0;
+                if (positionType === 'long') {
+                    pnl = ((exitPrice - position.entryPrice) / position.entryPrice) * position.btcAmount;
+                } else if (positionType === 'short') {
+                    pnl = ((position.entryPrice - exitPrice) / position.entryPrice) * position.btcAmount;
+                }
+
+                const previewEl = document.getElementById(`roll-pnl-preview-${positionType}`);
+                const valueEl = previewEl.querySelector('.pnl-preview-value');
+                valueEl.textContent = `${pnl >= 0 ? '+' : ''}${pnl.toFixed(4)} β`;
+                valueEl.className = `pnl-preview-value ${pnl >= 0 ? 'positive' : 'negative'}`;
+            }
+
+            executeClose(positionType) {
+                const position = this.positions[positionType];
+                const exitPrice = parseFloat(document.getElementById(`close-exit-${positionType}`).value);
+
+                if (!exitPrice) {
+                    alert('Please enter an exit price');
                     return;
                 }
 
-                const position = this.positions[positionType];
                 let pnl = 0;
-
                 if (positionType === 'spot') {
                     const btcPNL = ((this.btcPrice - position.entryPrice) / this.btcPrice) * position.amount;
                     pnl = btcPNL;
                 } else if (positionType === 'long') {
-                    pnl = ((price - position.entryPrice) / position.entryPrice) * position.btcAmount;
+                    pnl = ((exitPrice - position.entryPrice) / position.entryPrice) * position.btcAmount;
                 } else if (positionType === 'short') {
-                    pnl = ((position.entryPrice - price) / position.entryPrice) * position.btcAmount;
+                    pnl = ((position.entryPrice - exitPrice) / position.entryPrice) * position.btcAmount;
                 }
 
                 this.realizedPNL += pnl;
@@ -1523,35 +1485,24 @@
 
                 this.saveToLocalStorage();
                 this.render();
-
-                await this.modal.alert(
-                    'Position Closed',
-                    `PNL: ${pnl.toFixed(4)} BTC ($${(pnl * this.btcPrice).toFixed(2)})`
-                );
             }
 
-            rollPosition(positionType) {
-                const rollDiv = document.getElementById(`roll-${positionType}`);
-                rollDiv.classList.toggle('active');
-            }
+            executeRoll(positionType) {
+                const position = this.positions[positionType];
+                const exitPrice = parseFloat(document.getElementById(`roll-exit-${positionType}`).value);
+                const newInstId = document.getElementById(`roll-new-inst-${positionType}`).value.trim();
+                const newEntryPrice = parseFloat(document.getElementById(`roll-new-entry-${positionType}`).value);
 
-            async executeRoll(positionType) {
-                const newInstId = document.getElementById(`roll-${positionType}-instId`).value.trim();
-                const newEntryPrice = parseFloat(document.getElementById(`roll-${positionType}-price`).value);
-                const closingPrice = parseFloat(document.getElementById(`roll-${positionType}-closing`).value);
-
-                if (!newInstId || !newEntryPrice || !closingPrice) {
-                    await this.modal.alert('Invalid Input', 'Please fill in all rolling fields');
+                if (!exitPrice || !newInstId || !newEntryPrice) {
+                    alert('Please fill in all rolling fields');
                     return;
                 }
 
-                const position = this.positions[positionType];
                 let pnl = 0;
-
                 if (positionType === 'long') {
-                    pnl = ((closingPrice - position.entryPrice) / position.entryPrice) * position.btcAmount;
+                    pnl = ((exitPrice - position.entryPrice) / position.entryPrice) * position.btcAmount;
                 } else if (positionType === 'short') {
-                    pnl = ((position.entryPrice - closingPrice) / position.entryPrice) * position.btcAmount;
+                    pnl = ((position.entryPrice - exitPrice) / position.entryPrice) * position.btcAmount;
                 }
 
                 this.realizedPNL += pnl;
@@ -1562,15 +1513,8 @@
                 position.greeks = { delta: 0, gamma: 0, theta: 0, vega: 0 };
 
                 this.saveToLocalStorage();
-                this.updateAllPrices();
-
-                document.getElementById(`roll-${positionType}`).classList.remove('active');
                 this.render();
-
-                await this.modal.alert(
-                    'Position Rolled',
-                    `Realized PNL: ${pnl.toFixed(4)} BTC ($${(pnl * this.btcPrice).toFixed(2)})`
-                );
+                this.updateAllPrices();
             }
 
             render() {
@@ -1608,7 +1552,7 @@
                     this.attachPositionEventListeners('short');
                 }
                 if (this.positions.spot) {
-                    document.getElementById('close-spot').addEventListener('click', () => this.closePosition('spot'));
+                    this.attachSpotEventListeners();
                 }
             }
 
@@ -1649,7 +1593,29 @@
                         </div>
 
                         <div class="position-actions">
-                            <button class="btn btn-danger" id="close-spot">Close Position</button>
+                            <button class="btn btn-danger" id="close-spot-btn">Close Position</button>
+                        </div>
+
+                        <div class="action-panel" id="close-panel-spot">
+                            <h4>CLOSE POSITION</h4>
+                            <div class="panel-grid">
+                                <div class="input-row">
+                                    <label>Exit Price (BTC/USD):</label>
+                                    <input type="number" id="close-exit-spot" placeholder="${this.btcPrice}" step="0.01" value="${this.btcPrice}" oninput="dashboard.updateClosePNLPreview('spot')">
+                                </div>
+                                <div class="input-row">
+                                    <label>Tx Fee (BTC):</label>
+                                    <input type="number" id="close-fee-spot" placeholder="0.0003" step="0.0001" value="0">
+                                </div>
+                            </div>
+                            <div class="pnl-preview" id="close-pnl-preview-spot">
+                                <div class="pnl-preview-label">Net Realized PnL (BTC)</div>
+                                <div class="pnl-preview-value positive">+0.0000 β</div>
+                            </div>
+                            <div class="panel-buttons">
+                                <button class="btn btn-secondary" onclick="dashboard.toggleClosePanel('spot')">Cancel</button>
+                                <button class="btn btn-primary" onclick="dashboard.executeClose('spot')">Confirm Close</button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1662,6 +1628,12 @@
 
                 const usdPNL = pnl * this.btcPrice;
                 const pnlClass = pnl >= 0 ? 'positive' : 'negative';
+
+                // Position Greeks (scaled by BTC amount)
+                const positionDelta = position.greeks.delta * position.btcAmount;
+                const positionGamma = position.greeks.gamma * position.btcAmount;
+                const positionTheta = position.greeks.theta * position.btcAmount;
+                const positionVega = position.greeks.vega * position.btcAmount;
 
                 return `
                     <div class="position-card ${type}">
@@ -1696,11 +1668,44 @@
                         </div>
 
                         <div class="greeks-section">
+                            <h4>Contract Greeks (per 1 BTC)</h4>
                             <div class="greeks-grid">
-                                <div><strong>Δ:</strong> ${position.greeks.delta.toFixed(4)}</div>
-                                <div><strong>Γ:</strong> ${position.greeks.gamma.toFixed(4)}</div>
-                                <div><strong>θ:</strong> ${position.greeks.theta.toFixed(4)}</div>
-                                <div><strong>ν:</strong> ${position.greeks.vega.toFixed(4)}</div>
+                                <div class="greek-item">
+                                    <div class="greek-label">Delta</div>
+                                    <div class="greek-value">${position.greeks.delta.toFixed(4)}</div>
+                                </div>
+                                <div class="greek-item">
+                                    <div class="greek-label">Gamma</div>
+                                    <div class="greek-value">${position.greeks.gamma.toFixed(6)}</div>
+                                </div>
+                                <div class="greek-item">
+                                    <div class="greek-label">Theta</div>
+                                    <div class="greek-value">${position.greeks.theta.toFixed(6)}</div>
+                                </div>
+                                <div class="greek-item">
+                                    <div class="greek-label">Vega</div>
+                                    <div class="greek-value">${position.greeks.vega.toFixed(4)}</div>
+                                </div>
+                            </div>
+
+                            <h4 style="margin-top: 1rem;">Position Greeks (${position.btcAmount.toFixed(4)} BTC)</h4>
+                            <div class="greeks-grid">
+                                <div class="greek-item">
+                                    <div class="greek-label">Delta</div>
+                                    <div class="greek-value">${type === 'long' ? '+' : '-'}${Math.abs(positionDelta).toFixed(4)}</div>
+                                </div>
+                                <div class="greek-item">
+                                    <div class="greek-label">Gamma</div>
+                                    <div class="greek-value">${type === 'long' ? '+' : '-'}${Math.abs(positionGamma).toFixed(6)}</div>
+                                </div>
+                                <div class="greek-item">
+                                    <div class="greek-label">Theta</div>
+                                    <div class="greek-value">${type === 'long' ? '' : '-'}${Math.abs(positionTheta).toFixed(6)}</div>
+                                </div>
+                                <div class="greek-item">
+                                    <div class="greek-label">Vega</div>
+                                    <div class="greek-value">${type === 'long' ? '+' : '-'}${Math.abs(positionVega).toFixed(4)}</div>
+                                </div>
                             </div>
                         </div>
 
@@ -1710,34 +1715,79 @@
                         </div>
 
                         <div class="position-actions">
-                            <button class="btn btn-danger" id="close-${type}">Close Position</button>
-                            <button class="btn btn-success" id="roll-${type}-btn">Roll Position</button>
+                            <button class="btn btn-danger" id="close-${type}-btn">Close</button>
+                            <button class="btn btn-success" id="roll-${type}-btn">Roll</button>
                         </div>
 
-                        <div class="rolling-inputs" id="roll-${type}">
-                            <h4>Roll to New Position</h4>
-                            <div class="input-row">
-                                <label>Closing Price (BTC):</label>
-                                <input type="number" id="roll-${type}-closing" placeholder="0.003" step="0.0001">
+                        <!-- CLOSE PANEL -->
+                        <div class="action-panel" id="close-panel-${type}">
+                            <h4>CLOSE POSITION</h4>
+                            <div class="panel-grid">
+                                <div class="input-row">
+                                    <label>Exit Price (BTC):</label>
+                                    <input type="number" id="close-exit-${type}" placeholder="${position.markPrice.toFixed(4)}" step="0.0001" value="${position.markPrice.toFixed(4)}" oninput="dashboard.updateClosePNLPreview('${type}')">
+                                </div>
+                                <div class="input-row">
+                                    <label>Tx Fee (BTC):</label>
+                                    <input type="number" id="close-fee-${type}" placeholder="0.0003" step="0.0001" value="0">
+                                </div>
                             </div>
-                            <div class="input-row">
-                                <label>New Contract (instId):</label>
-                                <input type="text" id="roll-${type}-instId" placeholder="BTC-USD-251128-95000-C">
+                            <div class="pnl-preview" id="close-pnl-preview-${type}">
+                                <div class="pnl-preview-label">Net Realized PnL (BTC)</div>
+                                <div class="pnl-preview-value positive">+0.0000 β</div>
                             </div>
-                            <div class="input-row">
-                                <label>New Entry Price (BTC):</label>
-                                <input type="number" id="roll-${type}-price" placeholder="0.003" step="0.0001">
+                            <div class="panel-buttons">
+                                <button class="btn btn-secondary" onclick="dashboard.toggleClosePanel('${type}')">Cancel</button>
+                                <button class="btn btn-primary" onclick="dashboard.executeClose('${type}')">Confirm Close</button>
                             </div>
-                            <button class="btn btn-primary" id="execute-roll-${type}">Execute Roll</button>
+                        </div>
+
+                        <!-- ROLL PANEL -->
+                        <div class="action-panel" id="roll-panel-${type}">
+                            <h4>ROLL POSITION</h4>
+                            <div class="panel-grid">
+                                <div class="input-row">
+                                    <label>Exit Price (BTC):</label>
+                                    <input type="number" id="roll-exit-${type}" placeholder="${position.markPrice.toFixed(4)}" step="0.0001" value="${position.markPrice.toFixed(4)}" oninput="dashboard.updateRollPNLPreview('${type}')">
+                                </div>
+                                <div class="input-row">
+                                    <label>Tx Fee (BTC):</label>
+                                    <input type="number" id="roll-fee-${type}" placeholder="0.0003" step="0.0001" value="0">
+                                </div>
+                            </div>
+                            <div class="pnl-preview" id="roll-pnl-preview-${type}">
+                                <div class="pnl-preview-label">Net Realized PnL (BTC)</div>
+                                <div class="pnl-preview-value positive">+0.0000 β</div>
+                            </div>
+                            <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                                <h4 style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-secondary);">New Position</h4>
+                                <div class="panel-grid">
+                                    <div class="input-row">
+                                        <label>New Contract (instId):</label>
+                                        <input type="text" id="roll-new-inst-${type}" placeholder="BTC-USD-251206-100000-C">
+                                    </div>
+                                    <div class="input-row">
+                                        <label>New Entry Price (BTC):</label>
+                                        <input type="number" id="roll-new-entry-${type}" placeholder="0.05" step="0.0001">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-buttons">
+                                <button class="btn btn-secondary" onclick="dashboard.toggleRollPanel('${type}')">Cancel</button>
+                                <button class="btn btn-primary" onclick="dashboard.executeRoll('${type}')">Confirm Roll</button>
+                            </div>
                         </div>
                     </div>
                 `;
             }
 
             attachPositionEventListeners(type) {
-                document.getElementById(`close-${type}`).addEventListener('click', () => this.closePosition(type));
-                document.getElementById(`roll-${type}-btn`).addEventListener('click', () => this.rollPosition(type));
-                document.getElementById(`execute-roll-${type}`).addEventListener('click', () => this.executeRoll(type));
+                document.getElementById(`close-${type}-btn`).addEventListener('click', () => this.toggleClosePanel(type));
+                document.getElementById(`roll-${type}-btn`).addEventListener('click', () => this.toggleRollPanel(type));
+            }
+
+            attachSpotEventListeners() {
+                document.getElementById('close-spot-btn').addEventListener('click', () => this.toggleClosePanel('spot'));
             }
 
             renderSummary() {
@@ -1751,8 +1801,8 @@
                 this.updateSummaryValue('totalPNL', pnl.totalPNL);
 
                 document.getElementById('totalDelta').textContent = greeks.totalDelta.toFixed(4);
-                document.getElementById('totalGamma').textContent = greeks.totalGamma.toFixed(4);
-                document.getElementById('totalTheta').textContent = greeks.totalTheta.toFixed(4);
+                document.getElementById('totalGamma').textContent = greeks.totalGamma.toFixed(6);
+                document.getElementById('totalTheta').textContent = greeks.totalTheta.toFixed(6);
                 document.getElementById('totalVega').textContent = greeks.totalVega.toFixed(4);
             }
 
@@ -1828,8 +1878,11 @@
             }
         }
 
+        // Make dashboard globally accessible for inline onclick handlers
+        let dashboard;
+
         document.addEventListener('DOMContentLoaded', () => {
-            new BTCOptionsDashboard();
+            dashboard = new BTCOptionsDashboard();
         });
     </script>
 </body>
