@@ -2,6 +2,32 @@
 
 A real-time Bitcoin options trading dashboard with OKX and Deribit integration.
 
+## 🚀 Quick Start Options
+
+### Option 1: Standalone Version (Recommended for Most Users)
+**Zero installation required!** Just open `dashboard.html` in your browser.
+
+- ✅ **No npm, no Node.js, no installation**
+- ✅ **Single HTML file** - works anywhere
+- ✅ **Just double-click and go**
+- ✅ **Perfect for sharing** - send one file
+- ✅ **Works on mobile** browsers too
+
+📖 **[Read the Standalone Guide →](STANDALONE-README.md)**
+
+### Option 2: Development Version (For Developers)
+Full npm/Node.js version with separate files and development server.
+
+- 🛠️ Requires npm installation
+- 🛠️ Separate CSS/JS/HTML files
+- 🛠️ Local proxy server for CORS
+- 🛠️ Hot module reloading
+- 🛠️ Build process for production
+
+📖 **Instructions below**
+
+---
+
 ## Features
 
 - **BTC-Denominated Calculations**: All values calculated in BTC with USD display
@@ -19,15 +45,17 @@ A real-time Bitcoin options trading dashboard with OKX and Deribit integration.
   - Total PNL (Live + Realized)
 - **Diagnostics Panel**: Real-time API connection status, fallback events, and debug logs
 
-## Installation
+## Installation (Development Version Only)
+
+> **Note:** Skip this if you're using `dashboard.html` (standalone version)
 
 ```bash
 npm install
 ```
 
-## Running the Dashboard
+## Running the Dashboard (Development Version)
 
-The dashboard requires two servers:
+The development dashboard requires two servers:
 
 ### 1. Start the Proxy Server (Required for CORS)
 
