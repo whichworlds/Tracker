@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTC Options Dashboard</title>
+    <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>⚡ BTC Options Dashboard</h1>
+            <div class="connection-status" id="connectionStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">Connecting...</span>
+            </div>
+        </header>
+
+        <main>
+            <!-- Position Entry Section -->
+            <section class="card">
+                <h2>📊 Position Entry</h2>
+
+                <div class="position-inputs">
+                    <!-- Long Position -->
+                    <div class="position-group">
+                        <h3>Long Position (LEAP or Spot)</h3>
+
+                        <div class="toggle-container">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="useSpotBTC">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <label for="useSpotBTC">Use Spot BTC (Δ = 1.0) instead of LEAP call</label>
+                        </div>
+
+                        <div id="longLeapInputs">
+                            <div class="input-row">
+                                <label>Contract (instId):</label>
+                                <input type="text" id="longInstId" placeholder="BTC-USD-270627-100000-C">
+                            </div>
+                            <div class="input-row">
+                                <label>Entry Price (BTC):</label>
+                                <input type="number" id="longEntryPrice" placeholder="0.05" step="0.0001">
+                            </div>
+                            <div class="input-row">
+                                <label>Amount:</label>
+                                <input type="number" id="longAmount" placeholder="10" step="0.1">
+                            </div>
+                            <div class="input-row">
+                                <label>Contract Size (BTC):</label>
+                                <input type="number" id="longContractSize" placeholder="0.01" step="0.0001">
+                            </div>
+                        </div>
+
+                        <div id="longSpotInputs" style="display: none;">
+                            <div class="input-row">
+                                <label>Spot Entry Price (BTC/USD):</label>
+                                <input type="number" id="spotEntryPrice" placeholder="95000" step="0.01">
+                            </div>
+                            <div class="input-row">
+                                <label>BTC Amount:</label>
+                                <input type="number" id="spotAmount" placeholder="1.0" step="0.001">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" id="addLongPosition">Add Long Position</button>
+                    </div>
+
+                    <!-- Short Position -->
+                    <div class="position-group">
+                        <h3>Short Position (Weekly Call)</h3>
+
+                        <div class="input-row">
+                            <label>Contract (instId):</label>
+                            <input type="text" id="shortInstId" placeholder="BTC-USD-251121-92000-C">
+                        </div>
+                        <div class="input-row">
+                            <label>Entry Price (BTC):</label>
+                            <input type="number" id="shortEntryPrice" placeholder="0.003" step="0.0001">
+                        </div>
+                        <div class="input-row">
+                            <label>Amount:</label>
+                            <input type="number" id="shortAmount" placeholder="10" step="0.1">
+                        </div>
+                        <div class="input-row">
+                            <label>Contract Size (BTC):</label>
+                            <input type="number" id="shortContractSize" placeholder="0.01" step="0.0001">
+                        </div>
+
+                        <button class="btn btn-primary" id="addShortPosition">Add Short Position</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Active Positions -->
+            <section class="card">
+                <h2>📈 Active Positions</h2>
+                <div id="activePositions">
+                    <p class="empty-state">No active positions. Add positions above to get started.</p>
+                </div>
+            </section>
+
+            <!-- Summary Panel -->
+            <section class="card">
+                <h2>💰 Summary</h2>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-label">Long PNL</div>
+                        <div class="summary-value" id="longPNL">
+                            <span class="btc-value">0.0000 BTC</span>
+                            <span class="usd-value">($0.00)</span>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Short PNL</div>
+                        <div class="summary-value" id="shortPNL">
+                            <span class="btc-value">0.0000 BTC</span>
+                            <span class="usd-value">($0.00)</span>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Total Live PNL</div>
+                        <div class="summary-value" id="totalLivePNL">
+                            <span class="btc-value">0.0000 BTC</span>
+                            <span class="usd-value">($0.00)</span>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Realized PNL</div>
+                        <div class="summary-value" id="realizedPNL">
+                            <span class="btc-value">0.0000 BTC</span>
+                            <span class="usd-value">($0.00)</span>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Total PNL</div>
+                        <div class="summary-value total" id="totalPNL">
+                            <span class="btc-value">0.0000 BTC</span>
+                            <span class="usd-value">($0.00)</span>
+                        </div>
+                    </div>
+                    <div class="summary-item greeks">
+                        <div class="summary-label">Combined Greeks</div>
+                        <div class="greeks-grid" id="combinedGreeks">
+                            <div><strong>Δ:</strong> <span id="totalDelta">0.000</span></div>
+                            <div><strong>Γ:</strong> <span id="totalGamma">0.000</span></div>
+                            <div><strong>θ:</strong> <span id="totalTheta">0.000</span></div>
+                            <div><strong>ν:</strong> <span id="totalVega">0.000</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Debug Window -->
+        <button class="btn btn-debug" id="toggleDebug">Show Debug Window</button>
+        <div id="debugWindow" class="debug-window" style="display: none;">
+            <div class="debug-header">
+                <h3>🔍 Diagnostics Panel</h3>
+                <button class="btn-close" id="closeDebug">✕</button>
+            </div>
+            <div class="debug-content" id="debugContent">
+                <div class="debug-entry">
+                    <span class="timestamp">System initialized</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>

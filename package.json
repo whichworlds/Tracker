@@ -1,0 +1,20 @@
+{
+  "name": "btc-options-dashboard",
+  "version": "1.0.0",
+  "description": "BTC Options Trading Dashboard with OKX & Deribit Integration",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "proxy": "node proxy-server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
