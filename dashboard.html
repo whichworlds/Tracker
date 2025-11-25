@@ -52,6 +52,36 @@
             font-weight: 600;
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btc-price-display {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .btc-price-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.2rem;
+        }
+
+        .btc-price-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-success);
+            font-family: 'Courier New', monospace;
+        }
+
         .connection-status {
             display: flex;
             align-items: center;
@@ -121,6 +151,10 @@
         @media (max-width: 968px) {
             .position-inputs {
                 grid-template-columns: 1fr;
+            }
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
             }
         }
 
@@ -276,6 +310,126 @@
         .btn-debug:hover {
             background: var(--bg-secondary);
             transform: translateY(-2px);
+        }
+
+        /* CUSTOM MODAL STYLES */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .modal-header {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--accent-primary);
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .modal-btn-primary {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background: #4a7cd9;
+        }
+
+        .modal-btn-danger {
+            background: var(--accent-danger);
+            color: white;
+        }
+
+        .modal-btn-danger:hover {
+            background: #d94545;
+        }
+
+        .modal-btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-btn-secondary:hover {
+            background: var(--border-color);
         }
 
         .empty-state {
@@ -586,21 +740,21 @@
             border-left-color: var(--accent-primary);
             color: var(--text-primary);
         }
-
-        .alert.warning {
-            background: rgba(243, 156, 18, 0.1);
-            border-left-color: var(--accent-warning);
-            color: var(--text-primary);
-        }
     </style>
 </head>
 <body>
     <div id="app">
         <header>
             <h1>⚡ BTC Options Dashboard</h1>
-            <div class="connection-status" id="connectionStatus">
-                <span class="status-dot"></span>
-                <span class="status-text">Connecting...</span>
+            <div class="header-right">
+                <div class="btc-price-display" id="btcPriceDisplay">
+                    <div class="btc-price-label">Live BTC Price</div>
+                    <div class="btc-price-value" id="btcPriceValue">$--,---</div>
+                </div>
+                <div class="connection-status" id="connectionStatus">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Connecting...</span>
+                </div>
             </div>
         </header>
 
@@ -633,22 +787,21 @@
                                 <input type="text" id="longInstId" placeholder="BTC-USD-270627-100000-C">
                             </div>
                             <div class="input-row">
-                                <label>Entry Price (BTC):</label>
+                                <label>Entry Price (BTC per contract):</label>
                                 <input type="number" id="longEntryPrice" placeholder="0.05" step="0.0001">
                             </div>
                             <div class="input-row">
-                                <label>Amount:</label>
-                                <input type="number" id="longAmount" placeholder="10" step="0.1">
-                            </div>
-                            <div class="input-row">
-                                <label>Contract Size (BTC):</label>
-                                <input type="number" id="longContractSize" placeholder="0.01" step="0.0001">
+                                <label>BTC Amount (total BTC exposure):</label>
+                                <input type="number" id="longBTCAmount" placeholder="1.0" step="0.01">
+                                <small style="color: var(--text-secondary); margin-top: 0.3rem;">
+                                    Example: 1 BTC = buying 1 BTC worth of this option
+                                </small>
                             </div>
                         </div>
 
                         <div id="longSpotInputs" style="display: none;">
                             <div class="input-row">
-                                <label>Spot Entry Price (BTC/USD):</label>
+                                <label>Spot Entry Price (USD):</label>
                                 <input type="number" id="spotEntryPrice" placeholder="95000" step="0.01">
                             </div>
                             <div class="input-row">
@@ -669,16 +822,15 @@
                             <input type="text" id="shortInstId" placeholder="BTC-USD-251129-95000-C">
                         </div>
                         <div class="input-row">
-                            <label>Entry Price (BTC):</label>
+                            <label>Entry Price (BTC per contract):</label>
                             <input type="number" id="shortEntryPrice" placeholder="0.003" step="0.0001">
                         </div>
                         <div class="input-row">
-                            <label>Amount:</label>
-                            <input type="number" id="shortAmount" placeholder="10" step="0.1">
-                        </div>
-                        <div class="input-row">
-                            <label>Contract Size (BTC):</label>
-                            <input type="number" id="shortContractSize" placeholder="0.01" step="0.0001">
+                            <label>BTC Amount (total BTC exposure):</label>
+                            <input type="number" id="shortBTCAmount" placeholder="1.0" step="0.01">
+                            <small style="color: var(--text-secondary); margin-top: 0.3rem;">
+                                Example: 1 BTC = selling 1 BTC worth of this option
+                            </small>
                         </div>
 
                         <button class="btn btn-primary" id="addShortPosition">Add Short Position</button>
@@ -746,6 +898,15 @@
             </section>
         </main>
 
+        <!-- Custom Modal -->
+        <div class="modal-overlay" id="customModal">
+            <div class="modal-content">
+                <div class="modal-header" id="modalTitle">Confirm</div>
+                <div class="modal-body" id="modalBody">Are you sure?</div>
+                <div class="modal-buttons" id="modalButtons"></div>
+            </div>
+        </div>
+
         <!-- Debug Window -->
         <button class="btn btn-debug" id="toggleDebug">Show Debug Window</button>
         <div id="debugWindow" class="debug-window" style="display: none;">
@@ -763,6 +924,98 @@
 
     <script>
         // ============================================
+        // CUSTOM MODAL SYSTEM
+        // ============================================
+        class Modal {
+            constructor() {
+                this.overlay = document.getElementById('customModal');
+                this.title = document.getElementById('modalTitle');
+                this.body = document.getElementById('modalBody');
+                this.buttons = document.getElementById('modalButtons');
+            }
+
+            show(title, body, buttonsConfig) {
+                this.title.textContent = title;
+
+                if (typeof body === 'string') {
+                    this.body.textContent = body;
+                } else {
+                    this.body.innerHTML = '';
+                    this.body.appendChild(body);
+                }
+
+                this.buttons.innerHTML = '';
+                buttonsConfig.forEach(btn => {
+                    const button = document.createElement('button');
+                    button.className = `modal-btn modal-btn-${btn.type || 'secondary'}`;
+                    button.textContent = btn.text;
+                    button.onclick = () => {
+                        if (btn.onClick) btn.onClick();
+                        this.hide();
+                    };
+                    this.buttons.appendChild(button);
+                });
+
+                this.overlay.classList.add('active');
+            }
+
+            hide() {
+                this.overlay.classList.remove('active');
+            }
+
+            alert(title, message) {
+                return new Promise(resolve => {
+                    this.show(title, message, [
+                        { text: 'OK', type: 'primary', onClick: () => resolve(true) }
+                    ]);
+                });
+            }
+
+            confirm(title, message) {
+                return new Promise(resolve => {
+                    this.show(title, message, [
+                        { text: 'Cancel', type: 'secondary', onClick: () => resolve(false) },
+                        { text: 'Confirm', type: 'primary', onClick: () => resolve(true) }
+                    ]);
+                });
+            }
+
+            confirmDanger(title, message) {
+                return new Promise(resolve => {
+                    this.show(title, message, [
+                        { text: 'Cancel', type: 'secondary', onClick: () => resolve(false) },
+                        { text: 'Confirm', type: 'danger', onClick: () => resolve(true) }
+                    ]);
+                });
+            }
+
+            prompt(title, message, defaultValue = '', placeholder = '') {
+                return new Promise(resolve => {
+                    const input = document.createElement('input');
+                    input.className = 'modal-input';
+                    input.type = 'number';
+                    input.step = '0.0001';
+                    input.placeholder = placeholder;
+                    input.value = defaultValue;
+
+                    const container = document.createElement('div');
+                    const label = document.createElement('div');
+                    label.textContent = message;
+                    label.style.marginBottom = '0.8rem';
+                    container.appendChild(label);
+                    container.appendChild(input);
+
+                    this.show(title, container, [
+                        { text: 'Cancel', type: 'secondary', onClick: () => resolve(null) },
+                        { text: 'OK', type: 'primary', onClick: () => resolve(input.value) }
+                    ]);
+
+                    setTimeout(() => input.focus(), 100);
+                });
+            }
+        }
+
+        // ============================================
         // DATA LAYER - API Integration with Fallback
         // ============================================
         class DataLayer {
@@ -770,7 +1023,6 @@
                 this.debugCallbacks = [];
                 this.retryAttempts = 2;
                 this.retryDelay = 1000;
-                // Public CORS proxy for when direct access fails
                 this.corsProxy = 'https://corsproxy.io/?';
             }
 
@@ -811,7 +1063,6 @@
             }
 
             async fetchWithProxy(url) {
-                // Try direct first, then with CORS proxy
                 try {
                     return await this.fetchWithTimeout(url);
                 } catch (error) {
@@ -970,6 +1221,7 @@
         // ============================================
         class BTCOptionsDashboard {
             constructor() {
+                this.modal = new Modal();
                 this.dataLayer = new DataLayer();
                 this.positions = {
                     long: null,
@@ -1039,7 +1291,7 @@
                 });
             }
 
-            addLongPosition() {
+            async addLongPosition() {
                 const useSpot = document.getElementById('useSpotBTC').checked;
 
                 if (useSpot) {
@@ -1047,7 +1299,7 @@
                     const amount = parseFloat(document.getElementById('spotAmount').value);
 
                     if (!entryPrice || !amount) {
-                        alert('Please fill in all spot BTC fields');
+                        await this.modal.alert('Invalid Input', 'Please fill in all spot BTC fields');
                         return;
                     }
 
@@ -1062,11 +1314,10 @@
                 } else {
                     const instId = document.getElementById('longInstId').value.trim();
                     const entryPrice = parseFloat(document.getElementById('longEntryPrice').value);
-                    const amount = parseFloat(document.getElementById('longAmount').value);
-                    const contractSize = parseFloat(document.getElementById('longContractSize').value);
+                    const btcAmount = parseFloat(document.getElementById('longBTCAmount').value);
 
-                    if (!instId || !entryPrice || !amount || !contractSize) {
-                        alert('Please fill in all long position fields');
+                    if (!instId || !entryPrice || !btcAmount) {
+                        await this.modal.alert('Invalid Input', 'Please fill in all long position fields');
                         return;
                     }
 
@@ -1074,8 +1325,7 @@
                         type: 'long',
                         instId,
                         entryPrice,
-                        amount,
-                        contractSize,
+                        btcAmount,
                         markPrice: 0,
                         greeks: { delta: 0, gamma: 0, theta: 0, vega: 0 },
                         source: null,
@@ -1090,14 +1340,13 @@
                 this.updateAllPrices();
             }
 
-            addShortPosition() {
+            async addShortPosition() {
                 const instId = document.getElementById('shortInstId').value.trim();
                 const entryPrice = parseFloat(document.getElementById('shortEntryPrice').value);
-                const amount = parseFloat(document.getElementById('shortAmount').value);
-                const contractSize = parseFloat(document.getElementById('shortContractSize').value);
+                const btcAmount = parseFloat(document.getElementById('shortBTCAmount').value);
 
-                if (!instId || !entryPrice || !amount || !contractSize) {
-                    alert('Please fill in all short position fields');
+                if (!instId || !entryPrice || !btcAmount) {
+                    await this.modal.alert('Invalid Input', 'Please fill in all short position fields');
                     return;
                 }
 
@@ -1105,8 +1354,7 @@
                     type: 'short',
                     instId,
                     entryPrice,
-                    amount,
-                    contractSize,
+                    btcAmount,
                     markPrice: 0,
                     greeks: { delta: 0, gamma: 0, theta: 0, vega: 0 },
                     source: null,
@@ -1125,7 +1373,6 @@
                     clearInterval(this.updateInterval);
                 }
 
-                // Update every 10 seconds
                 this.updateInterval = setInterval(() => {
                     this.updateAllPrices();
                 }, 10000);
@@ -1134,6 +1381,7 @@
             async updateAllPrices() {
                 try {
                     this.btcPrice = await this.dataLayer.fetchBTCSpotPrice();
+                    this.updateBTCPriceDisplay();
 
                     const promises = [];
 
@@ -1151,6 +1399,16 @@
 
                 } catch (error) {
                     console.error('Error updating prices:', error);
+                }
+            }
+
+            updateBTCPriceDisplay() {
+                const display = document.getElementById('btcPriceValue');
+                if (this.btcPrice > 0) {
+                    display.textContent = '$' + this.btcPrice.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
                 }
             }
 
@@ -1181,12 +1439,14 @@
                     longPNL = btcPNL;
                 } else if (this.positions.long) {
                     const long = this.positions.long;
-                    longPNL = (long.markPrice - long.entryPrice) * long.amount * long.contractSize;
+                    // PNL = (mark - entry) * btcAmount / entry
+                    longPNL = ((long.markPrice - long.entryPrice) / long.entryPrice) * long.btcAmount;
                 }
 
                 if (this.positions.short) {
                     const short = this.positions.short;
-                    shortPNL = (short.entryPrice - short.markPrice) * short.amount * short.contractSize;
+                    // PNL = (entry - mark) * btcAmount / entry
+                    shortPNL = ((short.entryPrice - short.markPrice) / short.entryPrice) * short.btcAmount;
                 }
 
                 const totalLive = longPNL + shortPNL;
@@ -1205,34 +1465,44 @@
                     totalDelta = this.positions.spot.amount;
                 } else if (this.positions.long) {
                     const long = this.positions.long;
-                    totalDelta += long.greeks.delta * long.amount * long.contractSize;
-                    totalGamma += long.greeks.gamma * long.amount * long.contractSize;
-                    totalTheta += long.greeks.theta * long.amount * long.contractSize;
-                    totalVega += long.greeks.vega * long.amount * long.contractSize;
+                    // Greeks scaled by BTC amount
+                    totalDelta += long.greeks.delta * long.btcAmount;
+                    totalGamma += long.greeks.gamma * long.btcAmount;
+                    totalTheta += long.greeks.theta * long.btcAmount;
+                    totalVega += long.greeks.vega * long.btcAmount;
                 }
 
                 if (this.positions.short) {
                     const short = this.positions.short;
-                    totalDelta -= short.greeks.delta * short.amount * short.contractSize;
-                    totalGamma -= short.greeks.gamma * short.amount * short.contractSize;
-                    totalTheta -= short.greeks.theta * short.amount * short.contractSize;
-                    totalVega -= short.greeks.vega * short.amount * short.contractSize;
+                    totalDelta -= short.greeks.delta * short.btcAmount;
+                    totalGamma -= short.greeks.gamma * short.btcAmount;
+                    totalTheta -= short.greeks.theta * short.btcAmount;
+                    totalVega -= short.greeks.vega * short.btcAmount;
                 }
 
                 return { totalDelta, totalGamma, totalTheta, totalVega };
             }
 
-            closePosition(positionType) {
-                if (!confirm(`Are you sure you want to close the ${positionType} position?`)) {
-                    return;
-                }
+            async closePosition(positionType) {
+                const confirmed = await this.modal.confirmDanger(
+                    'Close Position',
+                    `Are you sure you want to close the ${positionType} position?`
+                );
 
-                const closingPrice = prompt(`Enter closing price in BTC:`);
+                if (!confirmed) return;
+
+                const closingPrice = await this.modal.prompt(
+                    'Close Position',
+                    'Enter closing price (BTC):',
+                    '',
+                    '0.003'
+                );
+
                 if (!closingPrice) return;
 
                 const price = parseFloat(closingPrice);
                 if (isNaN(price)) {
-                    alert('Invalid price');
+                    await this.modal.alert('Invalid Price', 'Please enter a valid number');
                     return;
                 }
 
@@ -1243,9 +1513,9 @@
                     const btcPNL = ((this.btcPrice - position.entryPrice) / this.btcPrice) * position.amount;
                     pnl = btcPNL;
                 } else if (positionType === 'long') {
-                    pnl = (price - position.entryPrice) * position.amount * position.contractSize;
+                    pnl = ((price - position.entryPrice) / position.entryPrice) * position.btcAmount;
                 } else if (positionType === 'short') {
-                    pnl = (position.entryPrice - price) * position.amount * position.contractSize;
+                    pnl = ((position.entryPrice - price) / position.entryPrice) * position.btcAmount;
                 }
 
                 this.realizedPNL += pnl;
@@ -1254,7 +1524,10 @@
                 this.saveToLocalStorage();
                 this.render();
 
-                alert(`Position closed. PNL: ${pnl.toFixed(4)} BTC ($${(pnl * this.btcPrice).toFixed(2)})`);
+                await this.modal.alert(
+                    'Position Closed',
+                    `PNL: ${pnl.toFixed(4)} BTC ($${(pnl * this.btcPrice).toFixed(2)})`
+                );
             }
 
             rollPosition(positionType) {
@@ -1262,13 +1535,13 @@
                 rollDiv.classList.toggle('active');
             }
 
-            executeRoll(positionType) {
+            async executeRoll(positionType) {
                 const newInstId = document.getElementById(`roll-${positionType}-instId`).value.trim();
                 const newEntryPrice = parseFloat(document.getElementById(`roll-${positionType}-price`).value);
                 const closingPrice = parseFloat(document.getElementById(`roll-${positionType}-closing`).value);
 
                 if (!newInstId || !newEntryPrice || !closingPrice) {
-                    alert('Please fill in all rolling fields');
+                    await this.modal.alert('Invalid Input', 'Please fill in all rolling fields');
                     return;
                 }
 
@@ -1276,9 +1549,9 @@
                 let pnl = 0;
 
                 if (positionType === 'long') {
-                    pnl = (closingPrice - position.entryPrice) * position.amount * position.contractSize;
+                    pnl = ((closingPrice - position.entryPrice) / position.entryPrice) * position.btcAmount;
                 } else if (positionType === 'short') {
-                    pnl = (position.entryPrice - closingPrice) * position.amount * position.contractSize;
+                    pnl = ((position.entryPrice - closingPrice) / position.entryPrice) * position.btcAmount;
                 }
 
                 this.realizedPNL += pnl;
@@ -1294,7 +1567,10 @@
                 document.getElementById(`roll-${positionType}`).classList.remove('active');
                 this.render();
 
-                alert(`Position rolled. Realized PNL: ${pnl.toFixed(4)} BTC ($${(pnl * this.btcPrice).toFixed(2)})`);
+                await this.modal.alert(
+                    'Position Rolled',
+                    `Realized PNL: ${pnl.toFixed(4)} BTC ($${(pnl * this.btcPrice).toFixed(2)})`
+                );
             }
 
             render() {
@@ -1358,7 +1634,7 @@
                                 <span class="detail-value">$${this.btcPrice.toFixed(2)}</span>
                             </div>
                             <div class="detail-item">
-                                <span class="detail-label">Amount:</span>
+                                <span class="detail-label">BTC Amount:</span>
                                 <span class="detail-value">${position.amount.toFixed(4)} BTC</span>
                             </div>
                             <div class="detail-item">
@@ -1381,8 +1657,8 @@
 
             renderOptionPosition(position, type) {
                 const pnl = type === 'long'
-                    ? (position.markPrice - position.entryPrice) * position.amount * position.contractSize
-                    : (position.entryPrice - position.markPrice) * position.amount * position.contractSize;
+                    ? ((position.markPrice - position.entryPrice) / position.entryPrice) * position.btcAmount
+                    : ((position.entryPrice - position.markPrice) / position.entryPrice) * position.btcAmount;
 
                 const usdPNL = pnl * this.btcPrice;
                 const pnlClass = pnl >= 0 ? 'positive' : 'negative';
@@ -1404,12 +1680,8 @@
                                 <span class="detail-value">${position.markPrice.toFixed(4)} BTC</span>
                             </div>
                             <div class="detail-item">
-                                <span class="detail-label">Amount:</span>
-                                <span class="detail-value">${position.amount}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Contract Size:</span>
-                                <span class="detail-value">${position.contractSize} BTC</span>
+                                <span class="detail-label">BTC Amount:</span>
+                                <span class="detail-value">${position.btcAmount.toFixed(4)} BTC</span>
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">Source:</span>
@@ -1512,7 +1784,6 @@
                 debugContent.appendChild(entryDiv);
                 debugContent.scrollTop = debugContent.scrollHeight;
 
-                // Keep only last 100 entries
                 while (debugContent.children.length > 100) {
                     debugContent.removeChild(debugContent.firstChild);
                 }
@@ -1557,7 +1828,6 @@
             }
         }
 
-        // Initialize the dashboard when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             new BTCOptionsDashboard();
         });
